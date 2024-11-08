@@ -1,0 +1,92 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
+const app = express();
+const port = 3000;
+
+// Middleware
+app.use(bodyParser.json());
+app.use(cors());
+
+// Sample data storage (for demonstration purposes)
+let cognitiveTests = [];
+let declineRisks = [];
+
+// Endpoint to submit cognitive test
+app.post('/brain-health/cognitive-test', (req, res) => {
+    const { userId, testType, testScore, timeTaken } = req.body;
+    cognitiveTests.push({ userId, testType, testScore, timeTaken });
+    res.status(201).send("Cognitive test submitted");
+});
+
+// Endpoint to assess cognitive decline risk
+app.post('/brain-health/decline-risk', (req, res) => {
+    const { userId, lifestyleFactors, medicalHistory, age, familyHistory } = req.body;
+    declineRisks.push({ userId, lifestyleFactors, medicalHistory, age, familyHistory });
+    res.status(201).send("Cognitive decline risk assessed");
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(Server running at http://localhost:${port});
+});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Health Monitoring</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <h1>Brain Health Monitoring</h1>
+    <h2>Cognitive Function Test Submission</h2>
+    
+    <form id="cognitiveTestForm">
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" name="userId" required><br><br>
+        
+        <label for="testType">Test Type:</label>
+        <input type="text" id="testType" name="testType" required><br><br>
+        
+        <label for="testScore">Test Score:</label>
+        <input type="number" id="testScore" name="testScore" required><br><br>
+        
+        <label for="timeTaken">Time Taken (in minutes):</label>
+        <input type="number" id="timeTaken" name="timeTaken" required><br><br>
+        
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('cognitiveTestForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const data = {
+                userId: document.getElementById('userId').value,
+                testType: document.getElementById('testType').value,
+                testScore: document.getElementById('testScore').value,
+                timeTaken: document.getElementById('timeTaken').value
+            };
+
+            fetch('http://localhost:3000/brain-health/cognitive-test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
